@@ -1,0 +1,44 @@
+# for local development
+version: '3.7'
+services:
+  crmbackend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: 'crmbackend'
+    restart: always
+    ports:
+    - '3000:3000'
+    volumes:
+    - './backend/:/app'
+    command: /bin/sh -c "npm run start:dev"
+    depends_on:
+      - crmmongodb
+  crmfrontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: 'crmfrontend'
+    restart: always
+    ports:
+    - '8080:3000'
+    volumes:
+    - './frontend/:/app'
+    command: /bin/sh -c "npm run start"
+  crmmongodb:
+    image: mongo
+    container_name: 'crmmongodb'
+    restart: always
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./initdb/:/docker-entrypoint-initdb.d
+      - docker-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootPassword
+      MONGO_INITDB_DATABASE: crmdb
+
+volumes:
+  docker-data:
+    name: users-mogoDB-data
